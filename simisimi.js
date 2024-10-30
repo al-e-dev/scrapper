@@ -7,7 +7,7 @@ class Simi {
     }
 
     async simi(query) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const params = new URLSearchParams()
             params.append('text', query)
             params.append('lc', 'es')

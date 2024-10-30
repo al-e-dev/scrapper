@@ -7,7 +7,7 @@ class Facebook {
     }
 
     async download(url) {
-        return new Promise(async (request, reject) => {
+        return new Promise(async (resolve, reject) => {
             const { data: html } = await axios({
                 method: "POST",
                 url: this.baseUrl + "/process",
@@ -36,7 +36,7 @@ class Facebook {
                 })
             })
 
-            request({
+            resolve({
                 title,
                 cover,
                 qualities
@@ -44,6 +44,3 @@ class Facebook {
         })
     }
 }
-
-const a = new Facebook()
-a.download("https://web.facebook.com/share/v/KoYBJBUYCssaqrZo/").then(_ => console.log(_)).catch(_ => console.log(_))

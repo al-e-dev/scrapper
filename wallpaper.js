@@ -59,7 +59,7 @@ class Wallpaper {
     }
 
     async search(query) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             const { data: html } = await axios.get(`${this.baseUrl}/search/${encodeURIComponent(query)}`);
             const $ = cheerio.load(html);
     

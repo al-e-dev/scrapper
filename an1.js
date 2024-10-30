@@ -72,7 +72,3 @@ class An1 {
 }
 
 const a = new An1()
-
-//a.download("https://an1.com/147-whatsapp-messenger.html").then(_ => console.log(_)).catch(_ => console.log(_))
-
-// a.search("whatsapp").then(_ => console.log(_)).catch(_ => console.log(_))

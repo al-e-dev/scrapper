@@ -9,49 +9,52 @@ class Pinterest {
     }
 
     async download(url) {
-        const response = await axios(url, {
-            method: "GET",
-            headers: {
-                "cookie": this.cookie
-            }
+        return new Promise(async (resolve, reject) => {
+            
+            const response = await axios(url, {
+                method: "GET",
+                headers: {
+                    "cookie": this.cookie
+                }
+            })
+    
+            const $ = cheerio.load(response.data)
+    
+            const title = $('div[data-test-id="CloseupDetails"] > div > h1').text().trim() ? $('div[data-test-id="CloseupDetails"] > div > h1').text().trim() : $('div[data-test-id="pinTitle"] > hi').text().trim() ? $('div[data-test-id="pinTitle"] > h1').text().trim() : 'a pinterest scrapper'
+            const description = $('div[data-test-id="truncated-description"] > div > div').text().trim() || 'a pinterest scrapper'
+            const download = $('div[data-test-id="pin-closeup-image"] > div > div').find('img').attr('src') ? $('div[data-test-id="pin-closeup-image"] > div > div').find('img').attr('src').replace('236x', '736x') : null
+    
+            const categories = [];
+            $('div[data-test-id="vase-tag"] > span > a').each((i, elem) => { categories.push($(elem).text().trim()) });
+    
+            const hashtags = [];
+            $('div.tBJ.dyH.iFc.sAJ.X8m.zDA.IZT.swG a').each((i, elem) => {
+                const text = $(elem).text().trim();
+                if (text.startsWith('#')) {
+                    hashtags.push(text);
+                }
+            });
+    
+            const link = $('div[data-test-id="creator-avatar"] a[data-test-id="creator-avatar-link"]').attr('href') ? $('div[data-test-id="creator-avatar"] a[data-test-id="creator-avatar-link"]').attr('href') : $('div[data-test-id="official-user-attribution"] a').attr('href')
+            const image = $('div[data-test-id="gestalt-avatar-svg"] > div > div > img').attr('src') 
+    
+            const name = $('div[data-test-id="creator-profile-name"] > div > div').text().trim() ? $('div[data-test-id="creator-profile-name"] > div > div').text().trim() : $('div[data-test-id="username"] div div').text().trim() ? $('div[data-test-id="username"] > div > div').text().trim() : $('div[data-test-id="creator-profile-name"] > div').text().trim() 
+            const followers = $('div[data-test-id="follower-count"] div.swG').text().trim() ? $('div[data-test-id="follower-count"] div.swG').text().trim() : $('div[data-test-id="follower-count"] div a').text().trim() ? $('div[data-test-id="follower-count"] div a').text().trim() : $('div[data-test-id="user-follower-count"] div div').text().trim()
+    
+            resolve({
+                title,
+                description,
+                categories,
+                hashtags,
+                author: {
+                    name,
+                    followers,
+                    link: link ? this.url + link : null,
+                    image: image ? image : null
+                },
+                download
+            })
         })
-
-        const $ = cheerio.load(response.data)
-
-        const title = $('div[data-test-id="CloseupDetails"] > div > h1').text().trim() ? $('div[data-test-id="CloseupDetails"] > div > h1').text().trim() : $('div[data-test-id="pinTitle"] > hi').text().trim() ? $('div[data-test-id="pinTitle"] > h1').text().trim() : 'a pinterest scrapper'
-        const description = $('div[data-test-id="truncated-description"] > div > div').text().trim() || 'a pinterest scrapper'
-        const download = $('div[data-test-id="pin-closeup-image"] > div > div').find('img').attr('src') ? $('div[data-test-id="pin-closeup-image"] > div > div').find('img').attr('src').replace('236x', '736x') : null
-
-        const categories = [];
-        $('div[data-test-id="vase-tag"] > span > a').each((i, elem) => { categories.push($(elem).text().trim()) });
-
-        const hashtags = [];
-        $('div.tBJ.dyH.iFc.sAJ.X8m.zDA.IZT.swG a').each((i, elem) => {
-            const text = $(elem).text().trim();
-            if (text.startsWith('#')) {
-                hashtags.push(text);
-            }
-        });
-
-        const link = $('div[data-test-id="creator-avatar"] a[data-test-id="creator-avatar-link"]').attr('href') ? $('div[data-test-id="creator-avatar"] a[data-test-id="creator-avatar-link"]').attr('href') : $('div[data-test-id="official-user-attribution"] a').attr('href')
-        const image = $('div[data-test-id="gestalt-avatar-svg"] > div > div > img').attr('src') 
-
-        const name = $('div[data-test-id="creator-profile-name"] > div > div').text().trim() ? $('div[data-test-id="creator-profile-name"] > div > div').text().trim() : $('div[data-test-id="username"] div div').text().trim() ? $('div[data-test-id="username"] > div > div').text().trim() : $('div[data-test-id="creator-profile-name"] > div').text().trim() 
-        const followers = $('div[data-test-id="follower-count"] div.swG').text().trim() ? $('div[data-test-id="follower-count"] div.swG').text().trim() : $('div[data-test-id="follower-count"] div a').text().trim() ? $('div[data-test-id="follower-count"] div a').text().trim() : $('div[data-test-id="user-follower-count"] div div').text().trim()
-
-        return {
-            title,
-            description,
-            categories,
-            hashtags,
-            author: {
-                name,
-                followers,
-                link: link ? this.url + link : null,
-                image: image ? image : null
-            },
-            download
-        };
 
     }
 
