@@ -3,9 +3,10 @@ import axios from "axios"
 class Twitter {
     constructor() {
         this.baseUrl = "https://twdown.net/download.php"
+        this.baseUrl = "https://x2twitter.com/api/ajaxSearch"
     }
     
-    async twitter(link) {
+    async v1(link) {
         return new Promise(async (resolve, reject) => {
             const config = {
                 'URL': link
@@ -31,4 +32,32 @@ class Twitter {
             })
         })
     }
+
+    async v2() {
+        return new Promise(async (resolve, reject) => {
+            const { data } = await axios.post(this.baseUrl, qs.stringify({
+                'q': tweetUrl,
+                'lang': 'id'
+            }), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'Accept': '/',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            
+            const $ = cheerio.load(data.data)
+            
+            const thumbnail = $('div.image-tw img').attr('src')
+            const mp4_1080p = $('a:contains("Unduh MP4 (1080p)")').attr('href')
+            const mp4_720p = $('a:contains("Unduh MP4 (720p)")').attr('href')
+
+            return {
+                thumbnail,
+                mp4_1080p,
+                mp4_720p
+            }
+        })
+    }
 }
+
